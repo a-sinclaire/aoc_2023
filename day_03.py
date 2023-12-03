@@ -1,6 +1,7 @@
 # Amelia Sinclaire 2023
 
 from data_loader import get_data
+from tests import TestAOC
 import re
 
 
@@ -48,20 +49,12 @@ def part_two(data):
 
 def main():
     data, test1, test2 = get_data()
-    if test1 is not None:
-        print('Testing part 1...')
-        test_1_expected = 4361
-        test_1_actual = part_one(test1)
-        if test_1_actual != test_1_expected:
-            raise Exception(f'Assertion Failed: Expected {test_1_expected} but got {test_1_actual}.')
-        print('Test 1 succeeded!')
-    if test2 is not None:
-        print('Testing part 2...')
-        test_2_expected = 467835
-        test_2_actual = part_two(test1)
-        if test_2_actual != test_2_expected:
-            raise Exception(f'Assertion Failed: Expected {test_2_expected} but got {test_2_actual}.')
-        print('Test 2 succeeded!')
+    test1_answer = 4361
+    test2_answer = 467835
+    tester = TestAOC(part_one, part_two, test1, test1_answer, test2, test2_answer)
+    tester.test_part_one()
+    tester.test_part_two()
+
     if data is not None:
         print('Calculating answer(s)...')
         print(f'Part one: {part_one(data)}')
