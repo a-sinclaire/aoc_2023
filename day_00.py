@@ -2,6 +2,7 @@
 
 from data_loader import get_data
 from tests import TestAOC
+import time
 
 
 def part_one(data):
@@ -21,8 +22,14 @@ def main():
 
     if data is not None:
         print('Calculating answer(s)...')
-        print(f'Part one: {part_one(data)}')
-        print(f'Part two: {part_two(data)}')
+        start = time.time()
+        p1 = part_one(data)
+        t = time.time() - start
+        print(f'Part one: {p1} in {t} seconds.')
+        start = time.time()
+        p2 = part_two(data)
+        t = time.time() - start
+        print(f'Part one: {p2} in {t} seconds.')
 
 
 if __name__ == '__main__':
