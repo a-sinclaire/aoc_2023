@@ -48,12 +48,9 @@ def part_two(data):
 
 
 def main():
-    data, test1, test2 = get_data()
-    test1_answer = 4361
-    test2_answer = 467835
-    tester = TestAOC(part_one, part_two, test1, test1_answer, test2, test2_answer)
-    tester.test_part_one()
-    tester.test_part_two()
+    data = get_data()
+    tester = TestAOC(test1_answer=4361, test2_answer=467835)
+    tester.test_all()
 
     if data is not None:
         print('Calculating answer(s)...')

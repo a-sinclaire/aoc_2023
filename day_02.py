@@ -1,6 +1,6 @@
 # Amelia Sinclaire 2023
 
-from data_loader import get_data
+from data_loader import get_data, get_test_data
 import re
 
 
@@ -51,7 +51,8 @@ def part_two(data):
 
 
 def main():
-    data, test1, test2 = get_data()
+    data = get_data()
+    test1, test2 = get_test_data()
     if test1 is not None:
         print('Testing part 1...')
         assert part_one(test1) == 8

@@ -14,6 +14,13 @@ def get_data():
         print(f'Could not find puzzle input at {file_path}')
         data = None
 
+    return data
+
+
+def get_test_data():
+    directory_name = os.path.dirname(__file__)
+    base_name = os.path.basename(__main__.__file__).strip('.py')
+
     test1_file_path = os.path.join(directory_name, f'data/{base_name}.test1')
     try:
         with open(test1_file_path) as f:
@@ -32,4 +39,4 @@ def get_data():
         print(f'Could not find test2 data at {test2_file_path}')
         test2 = None
 
-    return data, test1, test2
+    return test1, test2
