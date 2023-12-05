@@ -19,17 +19,33 @@ def adjacent_numbers(symbol, last_line, current_line, next_line):
     return numbers
 
 
+def adjacent_symbols(number, last_line, current_line, next_line):
+    number_start = number.start()
+    number_end = number.end()-1
+
+    # find location of symbols that are not numbers or periods in lines
+    last_symbols = list(re.finditer(r'[^\d.\s]', last_line)) if last_line is not None else []
+    current_symbols = list(re.finditer(r'[^\d.\s]', current_line))
+    next_symbols = list(re.finditer(r'[^\d.\s]', next_line)) if next_line is not None else []
+    symbols = []
+    for symbol in (last_symbols + current_symbols + next_symbols):
+        symbol_location = symbol.start()
+        if (symbol_location - 1 <= number_start <= symbol_location + 1) or (symbol_location - 1 <= number_end <= symbol_location + 1):
+            symbols.append(symbol.group())
+    return symbols
+
+
 def part_one(data):
     answer = 0
     for idx, current_line in enumerate(data):
-        last_line = data[idx-1] if idx > 0 else None
-        next_line = data[idx+1] if idx < len(data)-1 else None
-        # find location of symbols that are not numbers or periods
-        symbols = list(re.finditer(r'[^\d.\s]', current_line))
-        for symbol in symbols:
-            nums = adjacent_numbers(symbol, last_line, current_line, next_line)
-            for n in nums:
-                answer += int(n)
+        last_line = data[idx - 1] if idx > 0 else None
+        next_line = data[idx + 1] if idx < len(data) - 1 else None
+        # find location of numbers in this line
+        numbers = list(re.finditer(r'\d+', current_line))
+        for num in numbers:
+            symbols = adjacent_symbols(num, last_line, current_line, next_line)
+            if len(symbols) > 0:
+                answer += int(num.group())
     return answer
 
 
