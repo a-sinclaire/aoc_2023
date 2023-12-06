@@ -2,13 +2,14 @@
 
 from data_loader import get_data
 from tests import TestAOC
-import time
+from timing import time_it_decorator
 
 
 def distance(hold_time, race_time):
     return hold_time*(race_time-hold_time)
 
 
+@time_it_decorator
 def part_one(data):
     answer = 1
     race_times = [int(x) for x in data[0].split(':')[1].strip().split()]
@@ -21,6 +22,7 @@ def part_one(data):
     return answer
 
 
+@time_it_decorator
 def part_two(data):
     race_time = int(data[0].split(':')[1].replace(' ', ''))
     record = int(data[1].split(':')[1].replace(' ', ''))
@@ -31,19 +33,14 @@ def part_two(data):
 
 def main():
     data = get_data()
+    time_it_decorator.enabled = True
     tester = TestAOC(test1_answer=288, test2_answer=71503)
     tester.test_all()
 
     if data is not None:
         print('Calculating answer(s)...')
-        start = time.time()
-        p1 = part_one(data)
-        t = time.time() - start
-        print(f'Part one: {p1} in {t} seconds.')
-        start = time.time()
-        p2 = part_two(data)
-        t = time.time() - start
-        print(f'Part two: {p2} in {t} seconds.')
+        print(f'Part one: {part_one(data)}')
+        print(f'Part two: {part_two(data)}')
 
 
 if __name__ == '__main__':

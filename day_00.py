@@ -2,14 +2,16 @@
 
 from data_loader import get_data
 from tests import TestAOC
-import time
+from timing import time_it_decorator
 
 
+@time_it_decorator
 def part_one(data):
     answer = 0
     return answer
 
 
+@time_it_decorator
 def part_two(data):
     answer = 0
     return answer
@@ -17,19 +19,14 @@ def part_two(data):
 
 def main():
     data = get_data()
-    tester = TestAOC(test1_answer=-1, test2_answer=-1)
+    time_it_decorator.enabled = True
+    tester = TestAOC(test1_answer=288, test2_answer=71503)
     tester.test_all()
 
     if data is not None:
         print('Calculating answer(s)...')
-        start = time.time()
-        p1 = part_one(data)
-        t = time.time() - start
-        print(f'Part one: {p1} in {t} seconds.')
-        start = time.time()
-        p2 = part_two(data)
-        t = time.time() - start
-        print(f'Part two: {p2} in {t} seconds.')
+        print(f'Part one: {part_one(data)}')
+        print(f'Part two: {part_two(data)}')
 
 
 if __name__ == '__main__':
