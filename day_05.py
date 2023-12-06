@@ -3,7 +3,7 @@ import math
 
 from data_loader import get_data
 from tests import TestAOC
-import time
+from timing import time_it_decorator
 
 import re
 
@@ -29,6 +29,44 @@ class Map:
                 return str(destination)
         return source
 
+    def un_convert(self, destinations):
+        for k, v in self.map_dict.items():
+            source_range_start, source_range_end = k.split('_')
+            destination_range_start = int(v)
+            range_length = int(source_range_end)-int(source_range_start)
+            # print(f'destination range start: {v} | source range start: {source_range_start} | range length: {range_length}')
+            # print(f'generating source range from {source_range_start}-{int(source_range_start)+range_length} if destination in range')
+            # print(f'given destinations: {destinations}')
+            # my_destinations = []
+            # for i in range(range_length):
+            #     destination = str(int(destination_range_start)+i)
+            #     # print(f'checking destination {destination} is in given destinations: {destination in destinations}')
+            #     if destination in destinations:
+            #         my_destinations.append(destination)
+            #         continue
+            #     my_destinations.append()
+            # if len(my_destinations) > 0:
+            for destination in destinations:
+                # print(destination)
+                # find source that leads to d
+                # print(f'is {destination} within destination range {destination_range_start}-{destination_range_start+range_length} : {destination_range_start <= int(destination) <= destination_range_start+range_length}')
+                if destination_range_start <= int(destination) <= destination_range_start+range_length:
+                    source = int(source_range_start)+(int(destination)-destination_range_start)
+                    # print(f'{source} -> {destination}')
+                    yield str(source)
+                elif destination not in self.get_destinations():
+                    yield str(destination)
+
+    def get_destinations(self):
+        for k, v in self.map_dict.items():
+            source_range_start, source_range_end = k.split('_')
+            destination_range_start = int(v)
+            range_length = int(source_range_end)-int(source_range_start)
+            # print(f'destination range start: {destination_range_start} | source range start: {source_range_start} | range length: {range_length}')
+            # print(f'generating from {destination_range_start}-{destination_range_start+range_length}')
+            for i in range(range_length):
+                yield str(destination_range_start+i)
+
 # d = ['50 98 2',
 # '52 50 48']
 # m = Map(d)
@@ -48,9 +86,7 @@ class Garden:
         self.light_to_temperature_map = None
         self.temperature_to_humidity_map = None
         self.humidity_to_location_map = None
-        start = time.time()
         self.init_data(data)
-        print(f'Took {time.time()-start}s to initialize data structure.')
 
     def init_data(self, data):
         doing = {'doing_seeds': False,
@@ -164,6 +200,30 @@ class Garden:
         humidity = self.temperature_to_humidity_map.convert(temperature)
         return self.humidity_to_location_map.convert(humidity)
 
+    def locations_to_seeds(self, locations):
+        # print(f'finding humidity values that maped to locations {locations}:')
+        humidities = list(set(self.humidity_to_location_map.un_convert(locations)))
+        # print(humidities)
+        # print(f'finding temperature values that maped to humidities {humidities}:')
+        temperatures = list(set(self.temperature_to_humidity_map.un_convert(humidities)))
+        # print(temperatures)
+        # print(f'finding lights values that maped to temperatures {humidities}:')
+        lights = list(set(self.light_to_temperature_map.un_convert(temperatures)))
+        # print(lights)
+        # print(f'finding waters values that maped to lights {humidities}:')
+        waters = list(set(self.water_to_light_map.un_convert(lights)))
+        # print(waters)
+        # print(f'finding fertilizers values that maped to waters {humidities}:')
+        fertilizers = list(set(self.fertilizer_to_water_map.un_convert(waters)))
+        # print(fertilizers)
+        # print(f'finding soils values that maped to fertilizers {humidities}:')
+        soils = list(set(self.soil_to_fertilizer_map.un_convert(fertilizers)))
+        # print(soils)
+        # print(f'finding seeds values that maped to soils {humidities}:')
+        seeds = list(set(self.seed_to_soil_map.un_convert(soils)))
+        # print(seeds)
+        return seeds
+
     def yield_seed_range_seeds(self):
         for seed in self.seed_ranges:
             seed_value, seed_range = seed.split('_')
@@ -171,6 +231,7 @@ class Garden:
                 yield str(int(seed_value)+i)
 
 
+@time_it_decorator
 def part_one(data):
     g = Garden(data, generate_seed_ranges=False)
     min_location = math.inf
@@ -181,15 +242,35 @@ def part_one(data):
     return min_location
 
 
+@time_it_decorator
 def part_two(data):
     g = Garden(data, generate_seed_ranges=True)
     min_location = math.inf
     for seed in g.yield_seed_range_seeds():
         loc = int(g.seed_to_location(seed))
         if loc < min_location:
-            print(seed)
             min_location = loc
     return min_location
+
+# def part_two(data):
+#     g = Garden(data, generate_seed_ranges=False)
+#     locations = sorted(list(g.humidity_to_location_map.get_destinations()))
+#     print(locations)
+#     print(list(g.locations_to_seeds(['57'])))
+#     # for loc in locations:
+#     #     seeds = g.locations_to_seeds([loc])
+#     #     for s in seeds:
+#     #         print(s, '->', loc)
+#             # if s in g.seeds:
+#             #     return loc
+#     #
+#     # min_location = math.inf
+#     # for seed in g.yield_seed_range_seeds():
+#     #     loc = int(g.seed_to_location(seed))
+#     #     if loc < min_location:
+#     #         print(seed)
+#     #         min_location = loc
+#     return min(locations)
 
 
 def main():
@@ -199,14 +280,8 @@ def main():
 
     if data is not None:
         print('Calculating answer(s)...')
-        start = time.time()
-        p1 = part_one(data)
-        t = time.time() - start
-        print(f'Part one: {p1} in {t} seconds.')  # 0.001 seconds
-        # start = time.time()
-        # # p2 = part_two(data)
-        # t = time.time() - start
-        # print(f'Part two: {p2} in {t} seconds.')
+        print(f'Part one: {part_one(data)}')
+        # print(f'Part two: {part_two(data)}')  # estimation with current method = 51 hours
 
 
 if __name__ == '__main__':
