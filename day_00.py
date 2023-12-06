@@ -29,7 +29,7 @@ def main():
         start = time.time()
         p2 = part_two(data)
         t = time.time() - start
-        print(f'Part one: {p2} in {t} seconds.')
+        print(f'Part two: {p2} in {t} seconds.')
 
 
 if __name__ == '__main__':
