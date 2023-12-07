@@ -39,56 +39,48 @@ def get_hand_type(hand):
     card_counts = Counter(hand)
     match_counts = sorted(list(card_counts.values()), reverse=True)
     match len(match_counts):
-        case 1:  # only 5 of kind
-            return HandType.FiveOfAKind
-        case 2:  # 4 kind, full house
+        case 1: return HandType.FiveOfAKind
+        case 2:  # 4 kind or full house
             for n in match_counts:
                 if n == 4:
                     return HandType.FourOfAKind
             return HandType.FullHouse
-        case 3:  # 3 kind, 2 pair
+        case 3:  # 3 kind or 2 pair
             for n in match_counts:
                 if n == 3:
                     return HandType.ThreeOfAKind
             return HandType.TwoPair
-        case 4:  # one pair
-            return HandType.OnePair
-        case 5:  # high card
-            return HandType.HighCard
-        case default:
-            raise Exception('INVALID HAND -- CANNOT DETERMINE TYPE')
+        case 4: return HandType.OnePair
+        case 5: return HandType.HighCard
+        case default: raise Exception('INVALID HAND -- CANNOT DETERMINE TYPE')
 
 
-def score_hand_type(hand_type):
-    return hand_type.value * (15 ** 6)
+def score_hand_type(hand):
+    return get_hand_type(hand).value
 
 
-def score_card(card, is_part_one=True):
-    if is_part_one:
-        return AllCards.index(card) + 1
-    return AllCards2.index(card) + 1
-
-
-def score_hand(hand, is_part_one=True):
-    card_scores = []
+def score_cards(hand, is_part_one=True):
+    my_sum = 0
     for idx, card in enumerate(hand):
-        card_scores.append(score_card(card, is_part_one=is_part_one)*(15**(len(hand)-idx)))
-    if is_part_one:
-        return get_hand_type(hand).value*(15**(len(hand)+1)) + sum(card_scores)
-    return get_hand_type(upgrade_hand(hand)).value * (15 ** (len(hand) + 1)) + sum(card_scores)
+        if is_part_one:
+            card_value = AllCards.index(card) + 1
+        else:
+            card_value = AllCards2.index(card) + 1
+        my_sum += card_value * (15 ** (5 - idx))
+    return my_sum
 
 
 @time_it_decorator
 def part_one(data):
-    cards = [(y[0], y[1]) for y in [x.split() for x in data]]
-    rank = sorted(cards, key=lambda y: score_hand(y[0]))
+    hands = [(y[0], y[1]) for y in [x.split() for x in data]]
+    rank = sorted(hands, key=lambda h: (score_hand_type(h[0]), score_cards(h[0])))
     return sum([int(h[1])*(i+1) for i, h in enumerate(rank)])
 
 
 @time_it_decorator
 def part_two(data):
-    cards = [(y[0], y[1]) for y in [x.split() for x in data]]
-    rank = sorted(cards, key=lambda y: score_hand(y[0], is_part_one=False))
+    hands = [(y[0], y[1]) for y in [x.split() for x in data]]
+    rank = sorted(hands, key=lambda h: (score_hand_type(upgrade_hand(h[0])), score_cards(h[0], is_part_one=False)))
     return sum([int(h[1]) * (i + 1) for i, h in enumerate(rank)])
 
 
